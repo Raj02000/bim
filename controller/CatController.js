@@ -42,12 +42,27 @@ exports.getCategoryById = async (req, res) => {
   res.status(200).json({ success: true, category: category });
 };
 exports.updateCategory = async (req, res) => {
-  let category = await Category.findByIdAndUpdate(req.params.id, {
-    category_name: req.body.category_name,
-  });
-  if (!category) {
-    res.status(404).json({ success: false, detail: "Category not updated" });
+  try {
+    let category = await Category.findByIdAndUpdate(
+      req.params.id,
+      {
+        category_name: req.body.category_name,
+      },
+      { new: true }
+    );
+    if (!category) {
+      res.status(404).json({ success: false, detail: "Category not updated" });
+    }
+
+    res.status(200).json({ success: true, category: category });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
-  console.log("heyy");
-  res.status(200).json({ success: true, category: category });
+};
+exports.deleteCategory = async (req, res) => {
+  let category = await Category.findByIdAndDelete(req.params.id);
+  if (!category) {
+    res.status(400).json({ detail: "Category not deleted", success: false });
+  }
+  res.status(400).json({ detail: "Category  deleted", success: true });
 };
